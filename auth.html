@@ -1,63 +1,122 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CarePulse - Authentication</title>
-  <link rel="stylesheet" href="auth.css">
+  <title>CarePulse - Medical Appointments & AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo"><div class="logo-icon"><i class="ti ti-heart-handshake"></i></div> CarePulse</a>
-    <a href="index.html" class="nav-back"><i class="ti ti-arrow-left"></i> Back to Home</a>
+    <a href="#" class="logo">
+      <div class="logo-icon"><i class="ti ti-heart-handshake"></i></div>
+      CarePulse
+    </a>
+    <ul class="nav-links">
+      <li><a href="#doctors">Find Doctors</a></li>
+      <li><a href="#specialties">Specialties</a></li>
+      <li><a href="#about">About Us</a></li>
+    </ul>
+    <div class="nav-actions" id="navActions">
+      <a href="auth.html" class="btn-outline">Log In</a>
+      <a href="auth.html" class="btn-primary">Register</a>
+    </div>
   </nav>
 
-  <div class="auth-wrapper">
-    <div class="auth-left">
-      <h1 class="auth-tagline">Manage your health <span>efforts easily.</span></h1>
-      <p class="auth-desc">Join thousands of patients booking instant doctor appointments daily.</p>
+  <section class="hero">
+    <span class="hero-badge">✨ Healthcare Reimagined</span>
+    <h1>Your Health Journey,<br>Simplified & Intelligent.</h1>
+    <p>Book top-rated specialists near you and get instant guidance from our AI health assistant 24/7.</p>
+    <div class="hero-cta">
+      <a href="#doctors" class="btn-hero btn-hero-white">Find a Doctor</a>
+      <button class="btn-hero btn-hero-ghost" onclick="openAiChat()">Talk to AI</button>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div><div class="stat-num">500+</div><div class="stat-label">Verified Doctors</div></div>
+    <div><div class="stat-num">4.9/5</div><div class="stat-label">Patient Rating</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-label">AI Availability</div></div>
+    <div><div class="stat-num">50k+</div><div class="stat-label">Appointments</div></div>
+  </div>
+
+  <main>
+    <div class="search-card" id="doctors">
+      <h3>Search Top Specialists</h3>
+      <div class="search-grid">
+        <div class="field">
+          <label>Doctor Name or Condition</label>
+          <input type="text" id="searchInput" placeholder="e.g. Dr. Sharma or Cardiology">
+        </div>
+        <div class="field">
+          <label>Specialty</label>
+          <select id="specSelect">
+            <option value="">All Specialties</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Dermatology">Dermatology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Pediatrics">Pediatrics</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="cityInput" placeholder="Enter City">
+        </div>
+        <button class="btn-search" onclick="filterDoctors()">Search</button>
+      </div>
     </div>
 
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="tab-btn active" onclick="switchTab('login')">Login</button>
-        <button class="tab-btn" onclick="switchTab('register')">Register</button>
-      </div>
+    <div class="doctors-grid" id="doctorsContainer"></div>
+  </main>
 
-      <div class="auth-panel active" id="loginPanel">
-        <h2>Welcome Back</h2>
-        <div class="subtitle">Log in to manage appointments</div>
-        <div class="form-field">
-          <label>Email Address</label>
-          <div class="input-wrap"><i class="ti ti-mail ti"></i><input type="email" id="loginEmail" placeholder="you@example.com"></div>
-        </div>
-        <div class="form-field">
-          <label>Password</label>
-          <div class="input-wrap"><i class="ti ti-lock ti"></i><input type="password" id="loginPassword" placeholder="••••••••"></div>
-        </div>
-        <button class="btn-primary-full" onclick="handleLogin()">Sign In</button>
-      </div>
+  <button class="ai-fab" onclick="openAiChat()"><i class="ti ti-sparkles"></i> AI Health Assistant</button>
 
-      <div class="auth-panel" id="registerPanel">
-        <h2>Create Account</h2>
-        <div class="subtitle">Get started with CarePulse</div>
-        <div class="form-field">
-          <label>Full Name</label>
-          <div class="input-wrap"><i class="ti ti-user ti"></i><input type="text" id="regName" placeholder="John Doe"></div>
-        </div>
-        <div class="form-field">
-          <label>Email Address</label>
-          <div class="input-wrap"><i class="ti ti-mail ti"></i><input type="email" id="regEmail" placeholder="you@example.com"></div>
-        </div>
-        <div class="form-field">
-          <label>Password</label>
-          <div class="input-wrap"><i class="ti ti-lock ti"></i><input type="password" id="regPassword" placeholder="••••••••"></div>
-        </div>
-        <button class="btn-primary-full" onclick="handleRegister()">Create Account</button>
+  <div class="modal-overlay" id="aiModal">
+    <div class="modal ai-modal">
+      <div class="modal-header">
+        <h3>CarePulse AI Assistant</h3>
+        <button class="modal-close" onclick="closeAiChat()">&times;</button>
+      </div>
+      <div class="ai-chat-body" id="chatBody"></div>
+      <div class="ai-input-row">
+        <input type="text" id="aiInput" class="ai-input" placeholder="Ask about symptoms...">
+        <button class="ai-send-btn" onclick="sendAiMessage()">Send</button>
       </div>
     </div>
   </div>
-  <script src="auth.js"></script>
+
+  <div class="modal-overlay" id="bookModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Book Appointment</h3>
+        <button class="modal-close" onclick="closeBookModal()">&times;</button>
+      </div>
+      <div id="bookDoctorInfo" style="margin-bottom:1rem; font-weight:600;"></div>
+      <div class="form-field">
+        <label>Select Date</label>
+        <input type="date" id="bookDate">
+      </div>
+      <div class="form-field">
+        <label>Select Time</label>
+        <select id="bookTime">
+          <option>09:00 AM</option>
+          <option>10:00 AM</option>
+          <option>11:00 AM</option>
+          <option>02:00 PM</option>
+          <option>03:00 PM</option>
+          <option>04:00 PM</option>
+        </select>
+      </div>
+      <div id="bookMessage" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeBookModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
