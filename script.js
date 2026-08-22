@@ -1,124 +1,155 @@
 // Sample doctors data
  
-const doctors = [
-  { name: "Dr. Ananya Sharma", spec: "Cardiology", city: "Delhi", rating: 4.8, fee: 800, exp: "12 yrs" },
-  { name: "Dr. Rohan Verma", spec: "Dermatology", city: "Mumbai", rating: 4.6, fee: 600, exp: "8 yrs" },
-  { name: "Dr. Priya Nair", spec: "Neurology", city: "Bangalore", rating: 4.9, fee: 1200, exp: "15 yrs" },
-  { name: "Dr. Karan Mehta", spec: "Pediatrics", city: "Udaipur", rating: 4.7, fee: 500, exp: "10 yrs" },
-  { name: "Dr. Sneha Iyer", spec: "Cardiology", city: "Jaipur", rating: 4.5, fee: 900, exp: "9 yrs" }
-];
 
-let selectedDoctor = null;
+
+const API_BASE = '/api';
+let allDoctors = [];
+let filteredDoctors = [];
+let selectedSlot = '';
+let currentDoctor = null;
+
+async function fetchDoctors() {
+  const grid = document.getElementById('doctorsGrid');
+  try {
+    const response = await fetch(`${API_BASE}/doctors`);
+    const doctors = await response.json();
+    allDoctors = doctors;
+    filteredDoctors = [...allDoctors];
+    renderDoctors(filteredDoctors);
+  } catch (error) {
+    grid.innerHTML = `<p>Doctors load nahi ho paye. Page refresh karo.</p>`;
+  }
+}
 
 function renderDoctors(list) {
-  const container = document.getElementById('doctorsContainer');
-  container.innerHTML = '';
+  const grid = document.getElementById('doctorsGrid');
+  const countEl = document.getElementById('docCount');
+  if (countEl) countEl.textContent = `Showing ${list.length} doctor${list.length !== 1 ? 's' : ''}`;
   if (list.length === 0) {
-    container.innerHTML = '<p>No doctors found.</p>';
+    grid.innerHTML = `<p>Koi doctor nahi mila.</p>`;
     return;
   }
-  list.forEach(doc => {
-    const card = document.createElement('div');
-    card.className = 'doctor-card';
-    card.innerHTML = `
+  grid.innerHTML = list.map(d => `
+    <div class="doctor-card">
       <div class="doc-top">
-        <div class="doc-avatar" style="background:#DCFCE7;color:#059669;">${doc.name.split(' ').map(n => n[0]).join('')}</div>
-        <div>
-          <div class="doc-name">${doc.name}</div>
-          <div class="doc-spec">${doc.spec} • ${doc.city}</div>
-          <div class="doc-rating">⭐ ${doc.rating}</div>
+        <div class="doc-avatar" style="background:${d.color};color:${d.textColor}">${d.initials}</div>
+        <div class="doc-info">
+          <div class="doc-name">${d.name}</div>
+          <div class="doc-spec">${d.specialization}</div>
+          <div class="doc-rating">⭐ ${d.rating}</div>
         </div>
       </div>
       <div class="doc-badges">
-        <span class="badge badge-green">${doc.exp} experience</span>
-        <span class="badge badge-blue">₹${doc.fee} fee</span>
+        ${d.badges.map((b, i) => `<span class="badge ${i===0?'badge-green':i===1?'badge-blue':'badge-amber'}">${b}</span>`).join('')}
       </div>
       <div class="doc-divider"></div>
       <div class="doc-footer">
-        <div class="doc-meta">Available today</div>
-        <button class="btn-book" onclick='openBookModal(${JSON.stringify(doc)})'>Book Now</button>
+        <div class="doc-meta">
+          <div>${d.experience} experience</div>
+          <div>Fee: ${d.fee}</div>
+          <div style="color:var(--teal-400);font-weight:600">✓ ${d.avail}</div>
+        </div>
+        <button class="btn-book" onclick="openModal('${d._id}')">Book Now</button>
       </div>
-    `;
-    container.appendChild(card);
-  });
+    </div>
+  `).join('');
 }
 
 function filterDoctors() {
-  const searchVal = document.getElementById('searchInput').value.toLowerCase();
-  const spec = document.getElementById('specSelect').value;
-  const city = document.getElementById('cityInput').value.toLowerCase();
-  const filtered = doctors.filter(doc => {
-    const matchesSearch = doc.name.toLowerCase().includes(searchVal) || doc.spec.toLowerCase().includes(searchVal);
-    const matchesSpec = spec === '' || doc.spec === spec;
-    const matchesCity = city === '' || doc.city.toLowerCase().includes(city);
-    return matchesSearch && matchesSpec && matchesCity;
+  const name = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const spec = document.getElementById('specSelect')?.value || '';
+  const city = (document.getElementById('cityInput')?.value || '').toLowerCase();
+  filteredDoctors = allDoctors.filter(d => {
+    const matchName = !name || d.name.toLowerCase().includes(name) || d.specialization.toLowerCase().includes(name);
+    const matchSpec = !spec || d.specialization === spec;
+    return matchName && matchSpec;
   });
-  renderDoctors(filtered);
+  renderDoctors(filteredDoctors);
 }
 
-function openBookModal(doc) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Please login first to book an appointment');
-    window.location.href = 'auth.html';
-    return;
-  }
-  selectedDoctor = doc;
-  document.getElementById('bookDoctorInfo').innerText = `${doc.name} - ${doc.spec}`;
-  document.getElementById('bookMessage').innerText = '';
-  document.getElementById('bookModal').classList.add('open');
+function openModal(id) {
+  currentDoctor = allDoctors.find(d => d._id === id);
+  if (!currentDoctor) return;
+  document.getElementById('modalName').textContent = currentDoctor.name;
+  document.getElementById('modalSpec').textContent = currentDoctor.specialization;
+  const av = document.getElementById('modalAvatar');
+  av.textContent = currentDoctor.initials;
+  av.style.background = currentDoctor.color;
+  av.style.color = currentDoctor.textColor;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('patDate').min = today;
+  document.getElementById('patDate').value = today;
+  document.getElementById('patName').value = '';
+  document.getElementById('patPhone').value = '';
+  document.getElementById('patAge').value = '';
+  document.getElementById('patReason').value = '';
+  document.getElementById('bookingForm').style.display = '';
+  document.getElementById('successScreen').classList.remove('show');
+  document.querySelectorAll('.slot.selected').forEach(s => s.classList.remove('selected'));
+  selectedSlot = '';
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
-function closeBookModal() {
-  document.getElementById('bookModal').classList.remove('open');
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function selectSlot(el) {
+  if (el.classList.contains('unavailable')) return;
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = el.textContent;
 }
 
 async function confirmBooking() {
-  const date = document.getElementById('bookDate').value;
-  const time = document.getElementById('bookTime').value;
-  const msgBox = document.getElementById('bookMessage');
+  const name = document.getElementById('patName').value.trim();
+  const phone = document.getElementById('patPhone').value.trim();
+  const date = document.getElementById('patDate').value;
+  const age = document.getElementById('patAge').value;
+  const reason = document.getElementById('patReason').value.trim();
 
-  if (!date) {
-    msgBox.style.color = 'red';
-    msgBox.innerText = 'Please select a date';
-    return;
-  }
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!phone) { alert('Please enter your phone number.'); return; }
+  if (!date) { alert('Please select a date.'); return; }
+  if (!selectedSlot) { alert('Please select a time slot.'); return; }
 
-  const token = localStorage.getItem('token');
+  const bookingData = {
+    doctorId: currentDoctor._id,
+    patientName: name,
+    phone: phone,
+    age: age,
+    date: date,
+    slot: selectedSlot,
+    reason: reason || 'General Consultation'
+  };
+
   try {
-    const res = await fetch('/api/appointments', {
+    const response = await fetch(`${API_BASE}/bookings`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        doctorName: selectedDoctor.name,
-        specialty: selectedDoctor.spec,
-        date: date,
-        time: time
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
     });
-    const data = await res.json();
-    if (res.ok) {
-      msgBox.style.color = 'green';
-      msgBox.innerText = 'Appointment booked successfully!';
-      setTimeout(() => { closeBookModal(); }, 1500);
-    } else {
-      msgBox.style.color = 'red';
-      msgBox.innerText = data.error || 'Booking failed';
-    }
-  } catch (err) {
-    msgBox.style.color = 'red';
-    msgBox.innerText = 'Something went wrong. Try again.';
+    if (!response.ok) throw new Error('Booking failed');
+    const ref = `MCP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    showSuccess(ref, date);
+  } catch (error) {
+    alert('Booking fail ho gayi. Dobara try karo.');
   }
+}
+
+function showSuccess(ref, date) {
+  document.getElementById('bookingRef').textContent = 'REF: ' + ref;
+  const formattedDate = new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('bookingSummary').innerHTML = `<strong>${currentDoctor.name}</strong> · ${formattedDate} · ${selectedSlot}<br>Fee: ${currentDoctor.fee}`;
+  document.getElementById('bookingForm').style.display = 'none';
+  document.getElementById('successScreen').classList.add('show');
 }
 
 function openAiChat() {
   document.getElementById('aiModal').classList.add('open');
   const chatBody = document.getElementById('chatBody');
   if (chatBody.children.length === 0) {
-    addMessage("Hi! I'm your AI health assistant. Describe your symptoms and I'll suggest a specialist.", 'ai');
+    addMessage("Namaste! Main aapka AI Health Assistant hoon. Apni symptoms batao, main sahi specialist suggest karunga.", 'ai');
   }
 }
 
@@ -135,19 +166,27 @@ function addMessage(text, sender) {
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-function getAiReply(text) {
+const SYMPTOM_RULES = [
+  { keywords: ['seene', 'chest', 'dil', 'heart', 'dhadkan', 'bp'], specialist: 'Cardiologist', reply: 'Aapke symptoms heart se related lag rahe hain. Cardiologist se milna best rahega.' },
+  { keywords: ['sar', 'sir', 'headache', 'chakkar', 'dizziness'], specialist: 'Neurologist', reply: 'Ye neurological symptoms hain. Neurologist se milna theek rahega.' },
+  { keywords: ['skin', 'twacha', 'rash', 'khujli', 'itching'], specialist: 'Dermatologist', reply: 'Ye skin ki problem lag rahi hai. Dermatologist se consult karo.' },
+  { keywords: ['bachcha', 'child', 'baby', 'bachi'], specialist: 'Pediatrician', reply: 'Bachche ki health ke liye Pediatrician sahi hai.' },
+  { keywords: ['haddi', 'bone', 'joint', 'ghutna', 'kamar', 'dard'], specialist: 'Orthopedic', reply: 'Ye haddiyo ya joints se related hai. Orthopedic se milna best rahega.' },
+  { keywords: ['mahila', 'period', 'pregnancy', 'garbh'], specialist: 'Gynecologist', reply: 'Ye mahila health se related hai. Gynecologist se milna chahiye.' },
+  { keywords: ['tension', 'anxiety', 'stress', 'neend'], specialist: 'Psychiatrist', reply: 'Mental health se related hai. Psychiatrist se milna faydemand rahega.' },
+  { keywords: ['bukhar', 'fever', 'cold', 'khansi'], specialist: 'General Physician', reply: 'Ye aam symptoms hain. General Physician se milna theek rahega.' }
+];
+
+function analyzeSymptoms(text) {
   const lower = text.toLowerCase();
-  if (lower.includes('heart') || lower.includes('chest') || lower.includes('dil')) {
-    return "Based on your symptoms, I'd recommend seeing a Cardiologist. We have specialists available today.";
-  } else if (lower.includes('skin') || lower.includes('rash') || lower.includes('twacha')) {
-    return "This sounds like a skin-related issue. A Dermatologist would be the right specialist for you.";
-  } else if (lower.includes('head') || lower.includes('brain') || lower.includes('sar dard')) {
-    return "For headaches or nervous system issues, I'd suggest consulting a Neurologist.";
-  } else if (lower.includes('child') || lower.includes('baby') || lower.includes('bachcha')) {
-    return "For child healthcare concerns, please consult one of our Pediatricians.";
-  } else {
-    return "Thanks for sharing. Could you describe your symptoms in more detail so I can suggest the right specialist?";
+  let bestMatch = null;
+  let maxScore = 0;
+  for (const rule of SYMPTOM_RULES) {
+    const score = rule.keywords.filter(kw => lower.includes(kw)).length;
+    if (score > maxScore) { maxScore = score; bestMatch = rule; }
   }
+  if (!bestMatch) return { reply: 'Thoda aur detail batao apni symptoms ke baare mein.', specialist: null };
+  return bestMatch;
 }
 
 function sendAiMessage() {
@@ -157,37 +196,15 @@ function sendAiMessage() {
   addMessage(text, 'user');
   input.value = '';
   setTimeout(() => {
-    addMessage(getAiReply(text), 'ai');
-  }, 500);
-}
-
-function updateNavForLoggedInUser() {
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (token && user) {
-    const navActions = document.getElementById('navActions');
-    if (navActions) {
-      navActions.innerHTML = `
-        <span style="color:var(--gray-600); font-weight:500;">Hi, ${user.name}</span>
-        <button class="btn-outline" onclick="logout()">Log Out</button>
-      `;
-    }
-  }
-}
-
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.reload();
+    const { reply } = analyzeSymptoms(text);
+    addMessage(reply, 'ai');
+  }, 600);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderDoctors(doctors);
-  updateNavForLoggedInUser();
+  fetchDoctors();
   const aiInput = document.getElementById('aiInput');
   if (aiInput) {
-    aiInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendAiMessage();
-    });
+    aiInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendAiMessage(); });
   }
 });
