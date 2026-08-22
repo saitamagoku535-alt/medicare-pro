@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePulse - Authentication</title>
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo"><div class="logo-icon"><i class="ti ti-heart-handshake"></i></div> CarePulse</a>
+    <a href="index.html" class="nav-back"><i class="ti ti-arrow-left"></i> Back to Home</a>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <h1 class="auth-tagline">Manage your health <span>efforts easily.</span></h1>
+      <p class="auth-desc">Join thousands of patients booking instant doctor appointments daily.</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+        <button class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <div class="auth-panel active" id="loginPanel">
+        <h2>Welcome Back</h2>
+        <div class="subtitle">Log in to manage appointments</div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="input-wrap"><i class="ti ti-mail ti"></i><input type="email" id="loginEmail" placeholder="you@example.com"></div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="input-wrap"><i class="ti ti-lock ti"></i><input type="password" id="loginPassword" placeholder="••••••••"></div>
+        </div>
+        <button class="btn-primary-full" onclick="handleLogin()">Sign In</button>
+      </div>
+
+      <div class="auth-panel" id="registerPanel">
+        <h2>Create Account</h2>
+        <div class="subtitle">Get started with CarePulse</div>
+        <div class="form-field">
+          <label>Full Name</label>
+          <div class="input-wrap"><i class="ti ti-user ti"></i><input type="text" id="regName" placeholder="John Doe"></div>
+        </div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="input-wrap"><i class="ti ti-mail ti"></i><input type="email" id="regEmail" placeholder="you@example.com"></div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="input-wrap"><i class="ti ti-lock ti"></i><input type="password" id="regPassword" placeholder="••••••••"></div>
+        </div>
+        <button class="btn-primary-full" onclick="handleRegister()">Create Account</button>
+      </div>
+    </div>
+  </div>
+  <script src="auth.js"></script>
+</body>
+</html>
