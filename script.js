@@ -1,4 +1,5 @@
 // Sample doctors data
+ 
 const doctors = [
   { name: "Dr. Ananya Sharma", spec: "Cardiology", city: "Delhi", rating: 4.8, fee: 800, exp: "12 yrs" },
   { name: "Dr. Rohan Verma", spec: "Dermatology", city: "Mumbai", rating: 4.6, fee: 600, exp: "8 yrs" },
@@ -6,6 +7,8 @@ const doctors = [
   { name: "Dr. Karan Mehta", spec: "Pediatrics", city: "Udaipur", rating: 4.7, fee: 500, exp: "10 yrs" },
   { name: "Dr. Sneha Iyer", spec: "Cardiology", city: "Jaipur", rating: 4.5, fee: 900, exp: "9 yrs" }
 ];
+
+let selectedDoctor = null;
 
 function renderDoctors(list) {
   const container = document.getElementById('doctorsContainer');
@@ -33,7 +36,7 @@ function renderDoctors(list) {
       <div class="doc-divider"></div>
       <div class="doc-footer">
         <div class="doc-meta">Available today</div>
-        <button class="btn-book" onclick="alert('Login required to book appointment')">Book Now</button>
+        <button class="btn-book" onclick='openBookModal(${JSON.stringify(doc)})'>Book Now</button>
       </div>
     `;
     container.appendChild(card);
@@ -44,18 +47,73 @@ function filterDoctors() {
   const searchVal = document.getElementById('searchInput').value.toLowerCase();
   const spec = document.getElementById('specSelect').value;
   const city = document.getElementById('cityInput').value.toLowerCase();
-
   const filtered = doctors.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchVal) || doc.spec.toLowerCase().includes(searchVal);
     const matchesSpec = spec === '' || doc.spec === spec;
     const matchesCity = city === '' || doc.city.toLowerCase().includes(city);
     return matchesSearch && matchesSpec && matchesCity;
   });
-
   renderDoctors(filtered);
 }
 
-// AI Chat
+function openBookModal(doc) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please login first to book an appointment');
+    window.location.href = 'auth.html';
+    return;
+  }
+  selectedDoctor = doc;
+  document.getElementById('bookDoctorInfo').innerText = `${doc.name} - ${doc.spec}`;
+  document.getElementById('bookMessage').innerText = '';
+  document.getElementById('bookModal').classList.add('open');
+}
+
+function closeBookModal() {
+  document.getElementById('bookModal').classList.remove('open');
+}
+
+async function confirmBooking() {
+  const date = document.getElementById('bookDate').value;
+  const time = document.getElementById('bookTime').value;
+  const msgBox = document.getElementById('bookMessage');
+
+  if (!date) {
+    msgBox.style.color = 'red';
+    msgBox.innerText = 'Please select a date';
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch('/api/appointments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        doctorName: selectedDoctor.name,
+        specialty: selectedDoctor.spec,
+        date: date,
+        time: time
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msgBox.style.color = 'green';
+      msgBox.innerText = 'Appointment booked successfully!';
+      setTimeout(() => { closeBookModal(); }, 1500);
+    } else {
+      msgBox.style.color = 'red';
+      msgBox.innerText = data.error || 'Booking failed';
+    }
+  } catch (err) {
+    msgBox.style.color = 'red';
+    msgBox.innerText = 'Something went wrong. Try again.';
+  }
+}
+
 function openAiChat() {
   document.getElementById('aiModal').classList.add('open');
   const chatBody = document.getElementById('chatBody');
@@ -103,8 +161,29 @@ function sendAiMessage() {
   }, 500);
 }
 
+function updateNavForLoggedInUser() {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (token && user) {
+    const navActions = document.getElementById('navActions');
+    if (navActions) {
+      navActions.innerHTML = `
+        <span style="color:var(--gray-600); font-weight:500;">Hi, ${user.name}</span>
+        <button class="btn-outline" onclick="logout()">Log Out</button>
+      `;
+    }
+  }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.reload();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderDoctors(doctors);
+  updateNavForLoggedInUser();
   const aiInput = document.getElementById('aiInput');
   if (aiInput) {
     aiInput.addEventListener('keypress', (e) => {
