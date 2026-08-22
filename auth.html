@@ -1,122 +1,164 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CarePulse - Medical Appointments & AI Assistant</title>
+  <title>MediCare Pro — Doctor Appointment System</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body>
-  <nav>
-    <a href="#" class="logo">
-      <div class="logo-icon"><i class="ti ti-heart-handshake"></i></div>
-      CarePulse
-    </a>
-    <ul class="nav-links">
-      <li><a href="#doctors">Find Doctors</a></li>
-      <li><a href="#specialties">Specialties</a></li>
-      <li><a href="#about">About Us</a></li>
-    </ul>
-    <div class="nav-actions" id="navActions">
-      <a href="auth.html" class="btn-outline">Log In</a>
-      <a href="auth.html" class="btn-primary">Register</a>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <span class="hero-badge">✨ Healthcare Reimagined</span>
-    <h1>Your Health Journey,<br>Simplified & Intelligent.</h1>
-    <p>Book top-rated specialists near you and get instant guidance from our AI health assistant 24/7.</p>
-    <div class="hero-cta">
-      <a href="#doctors" class="btn-hero btn-hero-white">Find a Doctor</a>
-      <button class="btn-hero btn-hero-ghost" onclick="openAiChat()">Talk to AI</button>
-    </div>
-  </section>
-
-  <div class="stats-bar">
-    <div><div class="stat-num">500+</div><div class="stat-label">Verified Doctors</div></div>
-    <div><div class="stat-num">4.9/5</div><div class="stat-label">Patient Rating</div></div>
-    <div><div class="stat-num">24/7</div><div class="stat-label">AI Availability</div></div>
-    <div><div class="stat-num">50k+</div><div class="stat-label">Appointments</div></div>
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon"><i class="ti ti-heart-plus"></i></div>
+    MediCarePro
+  </a>
+  <ul class="nav-links">
+    <li><a href="#doctors">Doctors</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-actions" id="navActions">
+    <a href="auth.html" class="btn-outline">Sign In</a>
+    <a href="auth.html" class="btn-primary">Register</a>
   </div>
+</nav>
 
-  <main>
-    <div class="search-card" id="doctors">
-      <h3>Search Top Specialists</h3>
-      <div class="search-grid">
-        <div class="field">
-          <label>Doctor Name or Condition</label>
-          <input type="text" id="searchInput" placeholder="e.g. Dr. Sharma or Cardiology">
-        </div>
-        <div class="field">
-          <label>Specialty</label>
-          <select id="specSelect">
-            <option value="">All Specialties</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Dermatology">Dermatology</option>
-            <option value="Neurology">Neurology</option>
-            <option value="Pediatrics">Pediatrics</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>City</label>
-          <input type="text" id="cityInput" placeholder="Enter City">
-        </div>
-        <button class="btn-search" onclick="filterDoctors()">Search</button>
-      </div>
-    </div>
-
-    <div class="doctors-grid" id="doctorsContainer"></div>
-  </main>
-
-  <button class="ai-fab" onclick="openAiChat()"><i class="ti ti-sparkles"></i> AI Health Assistant</button>
-
-  <div class="modal-overlay" id="aiModal">
-    <div class="modal ai-modal">
-      <div class="modal-header">
-        <h3>CarePulse AI Assistant</h3>
-        <button class="modal-close" onclick="closeAiChat()">&times;</button>
-      </div>
-      <div class="ai-chat-body" id="chatBody"></div>
-      <div class="ai-input-row">
-        <input type="text" id="aiInput" class="ai-input" placeholder="Ask about symptoms...">
-        <button class="ai-send-btn" onclick="sendAiMessage()">Send</button>
-      </div>
-    </div>
+<section class="hero">
+  <div class="hero-badge">🏥 Trusted by 50,000+ Patients Across India</div>
+  <h1>Expert Doctors,<br>At Your Convenience</h1>
+  <p>Book appointments with top-rated specialists. Get quality healthcare, on your schedule.</p>
+  <div class="hero-cta">
+    <a href="#doctors" class="btn-hero btn-hero-white">Book Appointment</a>
+    <button class="btn-hero btn-hero-ghost" onclick="openAiChat()">AI Doctor Suggest</button>
   </div>
+</section>
 
-  <div class="modal-overlay" id="bookModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Book Appointment</h3>
-        <button class="modal-close" onclick="closeBookModal()">&times;</button>
+<div class="stats-bar">
+  <div><div class="stat-num">320+</div><div class="stat-label">Specialist Doctors</div></div>
+  <div><div class="stat-num">50K+</div><div class="stat-label">Happy Patients</div></div>
+  <div><div class="stat-num">4.9★</div><div class="stat-label">Average Rating</div></div>
+  <div><div class="stat-num">24/7</div><div class="stat-label">Online Support</div></div>
+</div>
+
+<main>
+  <div class="search-card" id="doctors">
+    <h3>Find the Right Doctor</h3>
+    <div class="search-grid">
+      <div class="field">
+        <label>Doctor Name or Keyword</label>
+        <input type="text" id="searchInput" placeholder="e.g. Dr. Sharma, Cardiologist...">
       </div>
-      <div id="bookDoctorInfo" style="margin-bottom:1rem; font-weight:600;"></div>
-      <div class="form-field">
-        <label>Select Date</label>
-        <input type="date" id="bookDate">
-      </div>
-      <div class="form-field">
-        <label>Select Time</label>
-        <select id="bookTime">
-          <option>09:00 AM</option>
-          <option>10:00 AM</option>
-          <option>11:00 AM</option>
-          <option>02:00 PM</option>
-          <option>03:00 PM</option>
-          <option>04:00 PM</option>
+      <div class="field">
+        <label>Specialization</label>
+        <select id="specSelect">
+          <option value="">All Specializations</option>
+          <option>Cardiologist</option>
+          <option>Neurologist</option>
+          <option>Dermatologist</option>
+          <option>Pediatrician</option>
+          <option>Orthopedic</option>
+          <option>Gynecologist</option>
+          <option>Psychiatrist</option>
+          <option>General Physician</option>
         </select>
       </div>
-      <div id="bookMessage" style="margin-top:0.5rem; font-size:0.85rem;"></div>
-      <div class="modal-footer">
-        <button class="btn-outline" onclick="closeBookModal()">Cancel</button>
-        <button class="btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+      <div class="field">
+        <label>City</label>
+        <input type="text" id="cityInput" placeholder="Enter City">
       </div>
+      <button class="btn-search" onclick="filterDoctors()">Search</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <div class="section-title">Available Doctors</div>
+  <div class="section-sub" id="docCount">Loading doctors...</div>
+  <div class="doctors-grid" id="doctorsGrid"></div>
+</main>
+
+<button class="ai-fab" onclick="openAiChat()"><i class="ti ti-sparkles"></i> AI Doctor Suggest</button>
+
+<div class="modal-overlay" id="aiModal">
+  <div class="modal ai-modal">
+    <div class="modal-header">
+      <h3>AI Symptom Checker</h3>
+      <button class="modal-close" onclick="closeAiChat()">&times;</button>
+    </div>
+    <div class="ai-chat-body" id="chatBody"></div>
+    <div class="ai-input-row">
+      <input type="text" id="aiInput" class="ai-input" placeholder="Apni symptoms yahan likho...">
+      <button class="ai-send-btn" onclick="sendAiMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Book Appointment</h3>
+      <button class="modal-close" onclick="closeModalDirect()">&times;</button>
+    </div>
+    <div id="bookingForm">
+      <div class="modal-doctor" style="display:flex;gap:1rem;align-items:center;margin-bottom:1.25rem;">
+        <div id="modalAvatar" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:600;"></div>
+        <div>
+          <div id="modalName" style="font-weight:600;font-size:1.05rem;"></div>
+          <div id="modalSpec" style="font-size:0.85rem;color:var(--gray-600);"></div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Patient Name</label>
+          <input type="text" id="patName" placeholder="Your full name">
+        </div>
+        <div class="form-field">
+          <label>Phone Number</label>
+          <input type="tel" id="patPhone" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" id="patDate">
+        </div>
+        <div class="form-field">
+          <label>Age</label>
+          <input type="number" id="patAge" placeholder="25" min="1" max="120">
+        </div>
+        <div class="form-field full">
+          <label>Preferred Time Slot</label>
+          <div class="time-slots">
+            <span class="slot" onclick="selectSlot(this)">9:00 AM</span>
+            <span class="slot" onclick="selectSlot(this)">10:00 AM</span>
+            <span class="slot unavailable">11:00 AM</span>
+            <span class="slot" onclick="selectSlot(this)">12:00 PM</span>
+            <span class="slot" onclick="selectSlot(this)">2:00 PM</span>
+            <span class="slot unavailable">3:00 PM</span>
+            <span class="slot" onclick="selectSlot(this)">4:00 PM</span>
+            <span class="slot" onclick="selectSlot(this)">5:00 PM</span>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Reason for Visit (Optional)</label>
+          <textarea id="patReason" placeholder="Describe your symptoms..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeModalDirect()">Cancel</button>
+        <button class="btn-primary" id="confirmBtn" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+    </div>
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon"><i class="ti ti-check"></i></div>
+      <div class="success-title">Appointment Confirmed!</div>
+      <p class="success-msg">Your appointment has been successfully booked.</p>
+      <div class="booking-ref" id="bookingRef">REF: MCP-2025-XXXX</div>
+      <div id="bookingSummary" style="font-size:0.85rem;color:var(--gray-600);"></div>
+      <button class="btn-primary" style="margin-top:1.5rem;" onclick="closeModalDirect()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
