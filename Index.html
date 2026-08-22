@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePulse - Medical Appointments & AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+  <nav>
+    <a href="#" class="logo">
+      <div class="logo-icon"><i class="ti ti-heart-handshake"></i></div>
+      CarePulse
+    </a>
+    <ul class="nav-links">
+      <li><a href="#doctors">Find Doctors</a></li>
+      <li><a href="#specialties">Specialties</a></li>
+      <li><a href="#about">About Us</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="auth.html" class="btn-outline">Log In</a>
+      <a href="auth.html" class="btn-primary">Register</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="hero-badge">✨ Healthcare Reimagined</span>
+    <h1>Your Health Journey,<br>Simplified & Intelligent.</h1>
+    <p>Book top-rated specialists near you and get instant guidance from our AI health assistant 24/7.</p>
+    <div class="hero-cta">
+      <a href="#doctors" class="btn-hero btn-hero-white">Find a Doctor</a>
+      <button class="btn-hero btn-hero-ghost" onclick="openAiChat()">Talk to AI</button>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div><div class="stat-num">500+</div><div class="stat-label">Verified Doctors</div></div>
+    <div><div class="stat-num">4.9/5</div><div class="stat-label">Patient Rating</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-label">AI Availability</div></div>
+    <div><div class="stat-num">50k+</div><div class="stat-label">Appointments</div></div>
+  </div>
+
+  <main>
+    <div class="search-card" id="doctors">
+      <h3>Search Top Specialists</h3>
+      <div class="search-grid">
+        <div class="field">
+          <label>Doctor Name or Condition</label>
+          <input type="text" id="searchInput" placeholder="e.g. Dr. Sharma or Cardiology">
+        </div>
+        <div class="field">
+          <label>Specialty</label>
+          <select id="specSelect">
+            <option value="">All Specialties</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Dermatology">Dermatology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Pediatrics">Pediatrics</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" id="cityInput" placeholder="Enter City">
+        </div>
+        <button class="btn-search" onclick="filterDoctors()">Search</button>
+      </div>
+    </div>
+
+    <div class="doctors-grid" id="doctorsContainer"></div>
+  </main>
+
+  <button class="ai-fab" onclick="openAiChat()"><i class="ti ti-sparkles"></i> AI Health Assistant</button>
+
+  <div class="modal-overlay" id="aiModal">
+    <div class="modal ai-modal">
+      <div class="modal-header">
+        <h3>CarePulse AI Assistant</h3>
+        <button class="modal-close" onclick="closeAiChat()">&times;</button>
+      </div>
+      <div class="ai-chat-body" id="chatBody"></div>
+      <div class="ai-input-row">
+        <input type="text" id="aiInput" class="ai-input" placeholder="Ask about symptoms...">
+        <button class="ai-send-btn" onclick="sendAiMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
